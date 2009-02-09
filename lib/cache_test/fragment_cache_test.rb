@@ -89,20 +89,25 @@ module CacheTest
     end
 
     # assert that the given action is being cached
-    def assert_cache_action
+    def assert_cache_action(*actions)
       fragment_cache_store.clear
       
       yield 
-           
-      assert_block("#{@controller.params.inspect} is not cached after executing block. Expected: #{@controller.fragment_cache_key(@controller.params)}") do
-        path = @controller.fragment_cache_key(@controller.params)
-        path << 'index' if path.last == '/'
-        path << ".#{@controller.params[:format]}" if @controller.params[:format] && @controller.params[:format] != 'html'
-        fragment_cache_store.written?(path)
+      
+      actions.each do |action|
+        action = { :action => action } unless action.is_a?(Hash)
+        assert_block("#{@controller.params.inspect} is not cached after executing block. Expected: #{@controller.fragment_cache_key(@controller.params)}") do
+          path = @controller.fragment_cache_key(@controller.params)
+          path << 'index' if path.last == '/'
+          path << ".#{@controller.params[:format]}" if @controller.params[:format] && @controller.params[:format] != 'html'
+          fragment_cache_store.written?(path)
+        end
       end
     
       fragment_cache_store.clear
     end
+    
+    alias :assert_cache_actions :assert_cache_action
 
     # assert that the given actions are not being cached
     def assert_not_cache_actions(*actions)
