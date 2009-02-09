@@ -22,6 +22,8 @@ module ActiveSupport
         @deleted.clear
         @deleted_matchers.clear
       end
+      
+      alias :reset :clear
 
       def read(name, options = nil)
         super
